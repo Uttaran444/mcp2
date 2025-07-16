@@ -48,6 +48,10 @@ const createCustomerSchema = z.object({
     customerData: z.record(z.unknown()).describe("A JSON object for the new customer. Must include dataAreaId, CustomerAccount, etc."),
 });
 
+const createItemSchema = z.object({
+    itemData: z.record(z.unknown()).describe("A JSON object for the new item. Must include dataAreaId, ItemNumber,ProductNumber etc."),
+});
+
 const updateCustomerSchema = z.object({
     dataAreaId: z.string().describe("The dataAreaId of the customer (e.g., 'usmf')."),
     customerAccount: z.string().describe("The customer account ID to update (e.g., 'PM-001')."),
@@ -150,6 +154,18 @@ export const getServer = (): McpServer => {
         async ({ customerData }: z.infer<typeof createCustomerSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/CustomersV3`;
             return makeApiCall('POST', url, customerData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'createItem',
+        'Creates a new item record in ReleasedProductCreationsV2.',
+        createItemSchema.shape,
+        async ({ itemData }: z.infer<typeof createItemSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/ReleasedProductCreationsV2`;
+            return makeApiCall('POST', url, itemData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
