@@ -58,6 +58,12 @@ const updateCustomerSchema = z.object({
     updateData: z.record(z.unknown()).describe("A JSON object with the fields to update."),
 });
 
+const updateItemSchema = z.object({
+    dataAreaId: z.string().describe("The dataAreaId of the item (e.g., 'usmf')."),
+    ItemNumber: z.string().describe("The item number to update (e.g., '1000')."),
+    updateData: z.record(z.unknown()).describe("A JSON object with the fields to update."),
+});
+
 const getEntityCountSchema = z.object({
     entity: z.string().describe("The OData entity set to count (e.g., CustomersV3)."),
     crossCompany: z.boolean().optional().describe("Set to true to count across all companies."),
@@ -177,6 +183,18 @@ export const getServer = (): McpServer => {
         updateCustomerSchema.shape,
         async ({ dataAreaId, customerAccount, updateData }: z.infer<typeof updateCustomerSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/CustomersV3(dataAreaId='${dataAreaId}',CustomerAccount='${customerAccount}')`;
+            return makeApiCall('PATCH', url, updateData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'updateItem',
+        'Updates an existing item record in ReleasedProductsV2 using a PATCH request.',
+        updateCustomerSchema.shape,
+        async ({ dataAreaId, ItemNumber, updateData }: z.infer<typeof updateItemchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/ReleasedProductsV2(dataAreaId='${dataAreaId}',ItemNumber='${ItemNumber}')`;
             return makeApiCall('PATCH', url, updateData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
