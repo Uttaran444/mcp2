@@ -53,7 +53,7 @@ const createItemSchema = z.object({
 });
 
 const createPurchaseRequisitionSchema = z.object({
-    itemData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
+    PurchaseRequisitionData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
 });
 
 const updateCustomerSchema = z.object({
