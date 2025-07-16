@@ -56,6 +56,9 @@ const createPurchaseRequisitionSchema = z.object({
     PurchaseRequisitionData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
 });
 
+const createPurchaseRequisitionLineSchema = z.object({
+    PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber  etc."),
+});
 const updateCustomerSchema = z.object({
     dataAreaId: z.string().describe("The dataAreaId of the customer (e.g., 'usmf')."),
     customerAccount: z.string().describe("The customer account ID to update (e.g., 'PM-001')."),
@@ -193,6 +196,18 @@ export const getServer = (): McpServer => {
         }
     );
 
+     server.tool(
+        'createPurchaseRequisitionLine',
+        'Creates a new PurchaseRequisitionLine record in PurchaseRequisitionLinesV2.',
+        createPurchaseRequisitionLineSchema.shape,
+        async ({ PurchaseRequisitionLineData }: z.infer<typeof createPurchaseRequisitionlineSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/PurchaseRequisitionLinesV2`;
+            return makeApiCall('POST', url, PurchaseRequisitionLineData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+    
     server.tool(
         'updateCustomer',
         'Updates an existing customer record in CustomersV3 using a PATCH request.',
