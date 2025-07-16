@@ -192,7 +192,7 @@ export const getServer = (): McpServer => {
      server.tool(
         'updateItem',
         'Updates an existing item record in ReleasedProductsV2 using a PATCH request.',
-        updateCustomerSchema.shape,
+         updateItemSchema.shape,
         async ({ dataAreaId, ItemNumber, updateData }: z.infer<typeof updateItemSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/ReleasedProductsV2(dataAreaId='${dataAreaId}',ItemNumber='${ItemNumber}')`;
             return makeApiCall('PATCH', url, updateData as Record<string, unknown>, async (notification) => {
