@@ -200,7 +200,7 @@ export const getServer = (): McpServer => {
         'createPurchaseRequisitionLine',
         'Creates a new PurchaseRequisitionLine record in PurchaseRequisitionLinesV2.',
         createPurchaseRequisitionLineSchema.shape,
-        async ({ PurchaseRequisitionLineData }: z.infer<typeof createPurchaseRequisitionlineSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+        async ({ PurchaseRequisitionLineData }: z.infer<typeof createPurchaseRequisitionLineSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/PurchaseRequisitionLinesV2`;
             return makeApiCall('POST', url, PurchaseRequisitionLineData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
