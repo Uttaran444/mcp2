@@ -52,6 +52,10 @@ const createItemSchema = z.object({
     itemData: z.record(z.unknown()).describe("A JSON object for the new item. Must include dataAreaId, ItemNumber,ProductNumber etc."),
 });
 
+const createPurchaseRequisitionSchema = z.object({
+    itemData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
+});
+
 const updateCustomerSchema = z.object({
     dataAreaId: z.string().describe("The dataAreaId of the customer (e.g., 'usmf')."),
     customerAccount: z.string().describe("The customer account ID to update (e.g., 'PM-001')."),
@@ -172,6 +176,18 @@ export const getServer = (): McpServer => {
         async ({ itemData }: z.infer<typeof createItemSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/ReleasedProductCreationsV2`;
             return makeApiCall('POST', url, itemData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'createPurchaseRequisitionHeader',
+        'Creates a new PurchaseRequisition record in PurchaseRequisitionHeaders.',
+        createPurchaseRequisitionSchema.shape,
+        async ({ PurchaseRequisitionData }: z.infer<typeof createPurchaseRequisitionSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/PurchaseRequisitionHeaders`;
+            return makeApiCall('POST', url, PurchaseRequisitionData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
