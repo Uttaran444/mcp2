@@ -231,7 +231,7 @@ export const getServer = (): McpServer => {
             });
         }
     );
-
+/*
     server.tool(
         'getEntityCount',
         'Gets the total count of records for a given OData entity.',
@@ -280,7 +280,7 @@ export const getServer = (): McpServer => {
             });
         }
     );
-
+*/
     server.tool(
         'action_initializeDataManagement',
         'Executes the InitializeDataManagement action on the DataManagementDefinitionGroups entity.',
