@@ -203,7 +203,7 @@ export const getServer = (): McpServer => {
      server.tool(
         'createSalesOrderHeader',
         'Creates a new salesorder record in SalesOrderHeadersV2.',
-        createSalesOrderHeadersSchema.shape,
+        createSalesOrderHeaderSchema.shape,
         async ({ SalesOrderHeaderData }: z.infer<typeof createSalesOrderHeaderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/SalesOrderHeadersV2`;
             return makeApiCall('POST', url, SalesOrderHeaderData as Record<string, unknown>, async (notification) => {
