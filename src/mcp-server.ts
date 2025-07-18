@@ -56,7 +56,7 @@ const createPurchaseRequisitionSchema = z.object({
     PurchaseRequisitionData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
 });
 
-const createSalesOrderHeadersSchema = z.object({
+const createSalesOrderHeaderSchema = z.object({
     SalesOrderHeaderData: z.record(z.unknown()).describe("A JSON object for the new SalesOrderHeader. Must include InvoiceCustomerAccountNumber,  etc."),
 });
 
