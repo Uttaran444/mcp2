@@ -56,6 +56,10 @@ const createPurchaseRequisitionSchema = z.object({
     PurchaseRequisitionData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisition. Must include RequisitionName,  etc."),
 });
 
+const createSalesOrderHeadersSchema = z.object({
+    SalesOrderHeaderData: z.record(z.unknown()).describe("A JSON object for the new SalesOrderHeader. Must include InvoiceCustomerAccountNumber,  etc."),
+});
+
 const createPurchaseRequisitionLineSchema = z.object({
     PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber, BuyingLegalEntityId, RequisitionLineNumber  etc."),
 });
@@ -197,6 +201,18 @@ export const getServer = (): McpServer => {
     );
 
      server.tool(
+        'createSalesOrderHeader',
+        'Creates a new salesorder record in SalesOrderHeadersV2.',
+        createSalesOrderHeadersSchema.shape,
+        async ({ SalesOrderHeaderData }: z.infer<typeof createSalesOrderHeaderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/SalesOrderHeadersV2`;
+            return makeApiCall('POST', url, SalesOrderHeaderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
         'createPurchaseRequisitionLine',
         'Creates a new PurchaseRequisitionLine record in PurchaseRequisitionLinesV2.',
         createPurchaseRequisitionLineSchema.shape,
@@ -207,7 +223,8 @@ export const getServer = (): McpServer => {
             });
         }
     );
-    
+
+
     server.tool(
         'updateCustomer',
         'Updates an existing customer record in CustomersV3 using a PATCH request.',
