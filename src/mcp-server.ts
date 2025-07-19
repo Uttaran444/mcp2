@@ -63,6 +63,11 @@ const createSalesOrderHeaderSchema = z.object({
 const createPurchaseRequisitionLineSchema = z.object({
     PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber, BuyingLegalEntityId, RequisitionLineNumber  etc."),
 });
+
+const createSalesOrderLineSchema = z.object({
+    SalesOrderLineData: z.record(z.unknown()).describe("A JSON object for the new SalesOrderLine. Must include SalesOrderNumber, ItemNumber etc."),
+});
+
 const updateCustomerSchema = z.object({
     dataAreaId: z.string().describe("The dataAreaId of the customer (e.g., 'usmf')."),
     customerAccount: z.string().describe("The customer account ID to update (e.g., 'PM-001')."),
@@ -207,6 +212,18 @@ export const getServer = (): McpServer => {
         async ({ SalesOrderHeaderData }: z.infer<typeof createSalesOrderHeaderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/SalesOrderHeadersV2`;
             return makeApiCall('POST', url, SalesOrderHeaderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'createSalesOrderLine',
+        'Creates a new salesorder record line in SalesOrderLinesV3.',
+        createSalesOrderLineSchema.shape,
+        async ({ SalesOrderLineData }: z.infer<typeof createSalesOrderLineSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/SalesOrderLinesV3`;
+            return makeApiCall('POST', url, SalesOrderLineData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
