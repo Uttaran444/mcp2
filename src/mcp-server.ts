@@ -60,6 +60,10 @@ const createSalesOrderHeaderSchema = z.object({
     SalesOrderHeaderData: z.record(z.unknown()).describe("A JSON object for the new SalesOrderHeader. Must include InvoiceCustomerAccountNumber,  etc."),
 });
 
+const createProductionOrderSchema = z.object({
+    ProductionOrderData: z.record(z.unknown()).describe("A JSON object for the new ProductionOrder. Must include ScheduledQuantity, ItemNumber, ProductionWarehouseId, ProductionSiteId  etc."),
+});
+
 const createPurchaseRequisitionLineSchema = z.object({
     PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber, BuyingLegalEntityId, RequisitionLineNumber  etc."),
 });
@@ -200,6 +204,18 @@ export const getServer = (): McpServer => {
         async ({ PurchaseRequisitionData }: z.infer<typeof createPurchaseRequisitionSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/PurchaseRequisitionHeaders`;
             return makeApiCall('POST', url, PurchaseRequisitionData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'createProductionOrder',
+        'Creates a new ProductionOrder record in ProductionOrderHeaders.',
+        createProductionOrderSchema.shape,
+        async ({ ProductionOrderData }: z.infer<typeof createProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/ProductionOrderHeaders`;
+            return makeApiCall('POST', url, ProductionOrderData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
