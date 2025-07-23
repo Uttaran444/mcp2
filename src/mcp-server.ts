@@ -175,7 +175,7 @@ export const getServer = (): McpServer => {
 
     server.tool(
         'createCustomer',
-        'Creates a new customer record in CustomersV3.',
+        'Creates a new customer record in CustomersV3. Requires CustomerGroupId, SalesCurrencyCode, OrganizationName.',
         createCustomerSchema.shape,
         async ({ customerData }: z.infer<typeof createCustomerSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/data/CustomersV3`;
