@@ -68,6 +68,23 @@ const estimateProductionOrderSchema = z.object({
     EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId"),
 });
 
+const releaseProductionOrderSchema = z.object({
+    ReleaseProductionOrderData: z.record(z.unknown()).describe("A JSON object for release production order. Must include ProdId"),
+});
+
+const startProductionOrderSchema = z.object({
+    StartProductionOrderData: z.record(z.unknown()).describe("A JSON object for start production order. Must include ProdId"),
+});
+
+const reportAsFinishedProductionOrderSchema = z.object({
+    ReportAsFinishedProductionOrderData: z.record(z.unknown()).describe("A JSON object for report as finished production order. Must include ProdId"),
+});
+
+const endProductionOrderSchema = z.object({
+    EndProductionOrderData: z.record(z.unknown()).describe("A JSON object for end production order. Must include ProdId"),
+});
+
+
 const createPurchaseRequisitionLineSchema = z.object({
     PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber, BuyingLegalEntityId, RequisitionLineNumber  etc."),
 });
@@ -237,6 +254,53 @@ export const getServer = (): McpServer => {
         }
     );
 
+    server.tool(
+        'releaseProductionOrder',
+        'Release production order.',
+        releaseProductionOrderSchema.shape,
+        async ({ ReleaseProductionOrderData }: z.infer<typeof releaseProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/releaseProductionOrder`;
+            return makeApiCall('POST', url, ReleaseProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    server.tool(
+        'startProductionOrder',
+        'Start production order.',
+        startProductionOrderSchema.shape,
+        async ({ StartProductionOrderData }: z.infer<typeof startProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/startProductionOrder`;
+            return makeApiCall('POST', url, StartProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    server.tool(
+        'reportAsFinishedProductionOrder',
+        'Report as finished production order.',
+        reportAsFinishedProductionOrderSchema.shape,
+        async ({ ReportAsFinishedProductionOrderData }: z.infer<typeof reportAsFinishedProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/reportAsFinishedProductionOrder`;
+            return makeApiCall('POST', url, ReportAsFinishedProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    server.tool(
+        'endProductionOrder',
+        'End production order.',
+        endProductionOrderSchema.shape,
+        async ({ EndProductionOrderData }: z.infer<typeof endProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/endProductionOrder`;
+            return makeApiCall('POST', url, EndProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
     
      server.tool(
         'createSalesOrderHeader',
