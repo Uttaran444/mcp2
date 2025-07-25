@@ -64,6 +64,10 @@ const createProductionOrderSchema = z.object({
     ProductionOrderData: z.record(z.unknown()).describe("A JSON object for the new ProductionOrder. Must include ScheduledQuantity, ItemNumber, ProductionWarehouseId, ProductionSiteId  etc."),
 });
 
+const estimateProductionOrderSchema = z.object({
+    EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId"),
+});
+
 const createPurchaseRequisitionLineSchema = z.object({
     PurchaseRequisitionLineData: z.record(z.unknown()).describe("A JSON object for the new PurchaseRequisitionLine. Must include RequisitionNumber, ItemNumber, BuyingLegalEntityId, RequisitionLineNumber  etc."),
 });
@@ -221,6 +225,19 @@ export const getServer = (): McpServer => {
         }
     );
 
+       server.tool(
+        'estimateProductionOrder',
+        'Estimate production order.',
+        estimateProductionOrderSchema.shape,
+        async ({ EstimateProductionOrderData }: z.infer<typeof estimateProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/estimateProductionOrder`;
+            return makeApiCall('POST', url, EstimateProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    
      server.tool(
         'createSalesOrderHeader',
         'Creates a new salesorder record in SalesOrderHeadersV2.',
