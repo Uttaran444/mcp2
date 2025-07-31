@@ -68,6 +68,14 @@ const estimateProductionOrderSchema = z.object({
     EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId"),
 });
 
+const getProductionOrderDefaultValuesSchema = z.object({
+    ProductionOrderDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order. Must include _itemId, _inventSiteId, _inventLocationId, _qtySched"),
+});
+
+const getMasterDataForProductionOrderDefaultValuesSchema = z.object({
+    ProductionOrderDefaultValueMasterData: z.record(z.unknown()).describe("A JSON object to get default values for production order. Must include field name"),
+});
+
 const releaseProductionOrderSchema = z.object({
     ReleaseProductionOrderData: z.record(z.unknown()).describe("A JSON object for release production order. Must include ProdId"),
 });
@@ -297,6 +305,30 @@ export const getServer = (): McpServer => {
         async ({ EndProductionOrderData }: z.infer<typeof endProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/endProductionOrder`;
             return makeApiCall('POST', url, EndProductionOrderData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+      server.tool(
+        'productionOrderDefaultValues',
+        'Get default values to create production order.',
+        getProductionOrderDefaultValuesSchema.shape,
+        async ({ ProductionOrderDefaultData }: z.infer<typeof getProductionOrderDefaultValuesSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getdefaultproductionordervalues`;
+            return makeApiCall('POST', url, ProductionOrderDefaultData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    server.tool(
+        'productionOrderMasterOfDefaultValues',
+        'Get list of data based on given field id',
+        getMasterDataForProductionOrderDefaultValuesSchema.shape,
+        async ({ ProductionOrderDefaultValueMasterData }: z.infer<typeof getMasterDataForProductionOrderDefaultValuesSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getproductionordermastervalues`;
+            return makeApiCall('POST', url, ProductionOrderDefaultValueMasterData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
