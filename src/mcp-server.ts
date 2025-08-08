@@ -65,11 +65,15 @@ const createProductionOrderSchema = z.object({
 });
 
 const estimateProductionOrderSchema = z.object({
-    EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId"),
+    EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId, ProfitSet"),
 });
 
 const getProductionOrderDefaultValuesSchema = z.object({
     ProductionOrderDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order. Must include _itemId, _inventSiteId, _inventLocationId, _qtySched"),
+});
+
+const getProductionOrderEstimationDefaultValuesSchema = z.object({
+    ProductionOrderEstimationDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order estimation . Must include ProdId"),
 });
 
 const getMasterDataForProductionOrderDefaultValuesSchema = z.object({
@@ -322,6 +326,18 @@ export const getServer = (): McpServer => {
         }
     );
 
+      server.tool(
+        'productionOrderEstimationDefaultValues',
+        'Get default values for production order estimation.',
+        getProductionOrderEstimationDefaultValuesSchema.shape,
+        async ({ ProductionOrderEstimationDefaultData }: z.infer<typeof getProductionOrderEstimationDefaultValuesSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getDefaultValuesForEstimation`;
+            return makeApiCall('POST', url, ProductionOrderDefaultData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
     server.tool(
         'productionOrderMasterOfDefaultValues',
         'Get list of data based on given field id',
@@ -470,3 +486,4 @@ export const getServer = (): McpServer => {
 
     return server;
 };
+
