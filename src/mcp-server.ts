@@ -332,7 +332,7 @@ export const getServer = (): McpServer => {
         getProductionOrderEstimationDefaultValuesSchema.shape,
         async ({ ProductionOrderEstimationDefaultData }: z.infer<typeof getProductionOrderEstimationDefaultValuesSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getDefaultValuesForEstimation`;
-            return makeApiCall('POST', url, ProductionOrderDefaultData as Record<string, unknown>, async (notification) => {
+            return makeApiCall('POST', url, ProductionOrderEstimationDefaultData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
@@ -486,4 +486,5 @@ export const getServer = (): McpServer => {
 
     return server;
 };
+
 
