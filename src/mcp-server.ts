@@ -268,7 +268,7 @@ export const getServer = (): McpServer => {
 
     server.tool(
         'releaseProductionOrder',
-        'Release production order.',
+        'Release production order. Must include ProdId and qty. Ask user if user wants to use ScheduledQuantity which was used during production order creation. If user say no then ask for qty and use that."',
         releaseProductionOrderSchema.shape,
         async ({ ReleaseProductionOrderData }: z.infer<typeof releaseProductionOrderSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/releaseProductionOrder`;
@@ -486,6 +486,7 @@ export const getServer = (): McpServer => {
 
     return server;
 };
+
 
 
 
