@@ -81,7 +81,7 @@ const getMasterDataForProductionOrderDefaultValuesSchema = z.object({
 });
 
 const releaseProductionOrderSchema = z.object({
-    ReleaseProductionOrderData: z.record(z.unknown()).describe("A JSON object for release production order. Must include ProdId"),
+    ReleaseProductionOrderData: z.record(z.unknown()).describe("A JSON object for release production order. Must include ProdId and qty. Ask user if user wants to use ScheduledQuantity which was used during production order creation. If user say no then ask for qty and use that."),
 });
 
 const startProductionOrderSchema = z.object({
@@ -486,5 +486,6 @@ export const getServer = (): McpServer => {
 
     return server;
 };
+
 
 
