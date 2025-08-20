@@ -68,6 +68,14 @@ const estimateProductionOrderSchema = z.object({
     EstimateProductionOrderData: z.record(z.unknown()).describe("A JSON object for estimate production order. Must include ProdId, ProfitSet"),
 });
 
+const createProductionOrderPickingListSchema = z.object({
+    createProductionOrderPickingListData: z.record(z.unknown()).describe("A JSON object to create picking list for production . Must include _prodId, _qty"),
+});
+
+const postProductionOrderPickingListSchema = z.object({
+    postProductionOrderPickingListData: z.record(z.unknown()).describe("A JSON object to post picking list for production . Must include _prodId"),
+});
+
 const getProductionOrderDefaultValuesSchema = z.object({
     ProductionOrderDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order. Must include _itemId, _inventSiteId, _inventLocationId, _qtySched"),
 });
@@ -270,6 +278,32 @@ export const getServer = (): McpServer => {
             });
         }
     );
+
+     server.tool(
+        'createProductionOrderPickingList',
+        'Create production order picking list.',
+        createProductionOrderPickingListSchema.shape,
+        async ({ createProductionOrderPickingListData }: z.infer<typeof createProductionOrderPickingListSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/createProductionOrderPickingList`;
+            return makeApiCall('POST', url, createProductionOrderPickingListData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'postProductionOrderPickingList',
+        'post production order picking list.',
+        postProductionOrderPickingListSchema.shape,
+        async ({ postProductionOrderPickingListData }: z.infer<typeof postProductionOrderPickingListSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/postProductionOrderPickingList`;
+            return makeApiCall('POST', url, postProductionOrderPickingListData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+    
+    
 
     server.tool(
         'releaseProductionOrder',
@@ -505,6 +539,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
