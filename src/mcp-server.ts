@@ -76,6 +76,11 @@ const getProductionOrderEstimationDefaultValuesSchema = z.object({
     ProductionOrderEstimationDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order estimation . Must include ProdId"),
 });
 
+const getProductionOrderStartDefaultValuesSchema = z.object({
+    ProductionOrderStartDefaultData: z.record(z.unknown()).describe("A JSON object to get default values for production order start . Must include ProdId"),
+});
+
+
 const getMasterDataForProductionOrderDefaultValuesSchema = z.object({
     ProductionOrderDefaultValueMasterData: z.record(z.unknown()).describe("A JSON object to get default values for production order. Must include field name"),
 });
@@ -85,7 +90,7 @@ const releaseProductionOrderSchema = z.object({
 });
 
 const startProductionOrderSchema = z.object({
-    StartProductionOrderData: z.record(z.unknown()).describe("A JSON object for start production order. Must include ProdId"),
+    StartProductionOrderData: z.record(z.unknown()).describe("A JSON object for start production order. Must include ProdId, RouteAutoConsump, bomAutoConsump, PostNowBOM"),
 });
 
 const reportAsFinishedProductionOrderSchema = z.object({
@@ -338,6 +343,20 @@ export const getServer = (): McpServer => {
         }
     );
 
+    
+server.tool(
+        'productionOrderStartDefaultValues',
+        'Get default values for production order start.',
+        getProductionOrderStartDefaultValuesSchema.shape,
+        async ({ ProductionOrderStartDefaultData }: z.infer<typeof getProductionOrderStartDefaultValuesSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getDefaultValuesForProductionOrderStart`;
+            return makeApiCall('POST', url, ProductionOrderStartDefaultData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    
     server.tool(
         'productionOrderMasterOfDefaultValues',
         'Get list of data based on given field id',
@@ -486,6 +505,7 @@ export const getServer = (): McpServer => {
 
     return server;
 };
+
 
 
 
