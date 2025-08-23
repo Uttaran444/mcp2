@@ -488,7 +488,7 @@ server.tool(
         'Get list of oper number for production order route card creation.',
          z.object({}).shape,
         async (_args: {}, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
-            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGD_ExportControlAIServiceGroup/IGD_ExportControlAIService/getListOfProdRoutes`;
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getListOfProdRoutes`;
              return makeApiCall('POST', url, {}, async (notification) => {
                 await safeNotification(context, notification);
             });
@@ -570,6 +570,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
