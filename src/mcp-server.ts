@@ -152,7 +152,7 @@ const updatePositionHierarchySchema = z.object({
 });
 
 const getListOfOperNumberSchema = z.object({
-    getListOfOperNumberData: z.record(z.unknown()).describe("Get list of Oper Number"),
+    getListOfOperNumberData: z.record(z.unknown()).describe("Get list of Oper Number. Must include ProdId"),
 });
 
 const createProductionOrderRouteCardSchema = z.object({
@@ -494,6 +494,18 @@ server.tool(
             });
         }
     );
+
+    server.tool(
+        'getListOfOperNumber',
+        'Get list of oper number for production order route card creation.',
+        getListOfOperNumberSchema.shape,
+        async ({ getListOfOperNumberData }: z.infer<typeof getListOfOperNumberSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getListOfProdRoutes`;
+            return makeApiCall('POST', url, getListOfOperNumberData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
 /*
     server.tool(
         'getEntityCount',
@@ -570,6 +582,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
