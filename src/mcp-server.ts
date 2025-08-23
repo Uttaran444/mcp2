@@ -151,6 +151,13 @@ const updatePositionHierarchySchema = z.object({
     updateData: z.record(z.unknown()).describe("A JSON object with the fields to update (e.g., ParentPositionId)."),
 });
 
+const getListOfOperNumberSchema = z.object({
+    getListOfOperNumberData: z.record(z.unknown()).describe("Get list of Oper Number"),
+});
+
+const createProductionOrderRouteCardSchema = z.object({
+    createProductionOrderRouteCardData: z.record(z.unknown()).describe("A JSON object to create and post route card for production order. Must include ProdId, OprNum, QtyGood, Hours"),
+});
 
 /**
  * Creates and configures the MCP server with all the tools for the D365 API.
@@ -286,6 +293,18 @@ export const getServer = (): McpServer => {
         async ({ createProductionOrderPickingListData }: z.infer<typeof createProductionOrderPickingListSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
             const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/createProductionOrderPickingList`;
             return makeApiCall('POST', url, createProductionOrderPickingListData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+     server.tool(
+        'createProductionOrderRouteCard',
+        'Create and post production order route card.',
+        createProductionOrderRouteCardSchema.shape,
+        async ({ createProductionOrderRouteCardData }: z.infer<typeof createProductionOrderRouteCardSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/createAndPostRouteCard`;
+            return makeApiCall('POST', url, createProductionOrderRouteCardData as Record<string, unknown>, async (notification) => {
                 await safeNotification(context, notification);
             });
         }
@@ -463,6 +482,18 @@ server.tool(
             });
         }
     );
+
+      server.tool(
+        'getListOfOperNumber',
+        'Get list of oper number for production order route card creation.',
+         z.object({}).shape,
+        async (_args: {}, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGD_ExportControlAIServiceGroup/IGD_ExportControlAIService/getListOfProdRoutes`;
+             return makeApiCall('POST', url, {}, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
 /*
     server.tool(
         'getEntityCount',
@@ -539,6 +570,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
