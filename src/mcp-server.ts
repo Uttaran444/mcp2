@@ -483,18 +483,7 @@ server.tool(
         }
     );
 
-      server.tool(
-        'getListOfOperNumber',
-        'Get list of oper number for production order route card creation.',
-         z.object({}).shape,
-        async (_args: {}, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
-            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getListOfProdRoutes`;
-             return makeApiCall('POST', url, {}, async (notification) => {
-                await safeNotification(context, notification);
-            });
-        }
-    );
-
+   
     server.tool(
         'getListOfOperNumber',
         'Get list of oper number for production order route card creation.',
@@ -582,6 +571,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
