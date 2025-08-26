@@ -163,6 +163,9 @@ const createProductionOrderRouteCardSchema = z.object({
     createProductionOrderRouteCardData: z.record(z.unknown()).describe("A JSON object to create and post route card for production order. Must include ProdId, OprNum, QtyGood, Hours"),
 });
 
+const createProductionOrderJobCardSchema = z.object({
+    createProductionOrderJobCardData: z.record(z.unknown()).describe("A JSON object to create and post job card for production order. Must include ProdId, JobId, QtyGood, Hours"),
+});
 /**
  * Creates and configures the MCP server with all the tools for the D365 API.
  * @returns {McpServer} The configured McpServer instance. 
@@ -314,6 +317,19 @@ export const getServer = (): McpServer => {
         }
     );
 
+
+     server.tool(
+    'createProductionOrderJobCard',
+    'Create and post production order job card.',
+    createProductionOrderJobCardSchema.shape,
+    async ({ createProductionOrderJobCardData }: z.infer<typeof createProductionOrderJobCardSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+        const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/createAndPostJobCard`;
+        return makeApiCall('POST', url, createProductionOrderJobCardData as Record<string, unknown>, async (notification) => {
+            await safeNotification(context, notification);
+        });
+    }
+);
+    
      server.tool(
         'postProductionOrderPickingList',
         'post production order picking list.',
@@ -587,6 +603,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
