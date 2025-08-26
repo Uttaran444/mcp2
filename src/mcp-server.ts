@@ -155,6 +155,10 @@ const getListOfOperNumberSchema = z.object({
     getListOfOperNumberData: z.record(z.unknown()).describe("Get list of Oper Number. Must include ProdId"),
 });
 
+const getListOfJobIdentifierSchema = z.object({
+    getListOfJobIdentifierData: z.record(z.unknown()).describe("Get list of Job identifiers. Must include ProdId"),
+});
+
 const createProductionOrderRouteCardSchema = z.object({
     createProductionOrderRouteCardData: z.record(z.unknown()).describe("A JSON object to create and post route card for production order. Must include ProdId, OprNum, QtyGood, Hours"),
 });
@@ -495,6 +499,18 @@ server.tool(
             });
         }
     );
+
+    server.tool(
+        'getListOfJobIdentifier',
+        'Get list of job identifiers for production order job card creation.',
+        getListOfJobIdentifierSchema.shape,
+        async ({ getListOfJobIdentifierData }: z.infer<typeof getListOfJobIdentifierSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getListOfProdRouteJobs`;
+            return makeApiCall('POST', url, getListOfJobIdentifierData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
 /*
     server.tool(
         'getEntityCount',
@@ -571,6 +587,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
