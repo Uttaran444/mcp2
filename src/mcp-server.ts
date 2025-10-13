@@ -166,6 +166,10 @@ const createProductionOrderRouteCardSchema = z.object({
 const createProductionOrderJobCardSchema = z.object({
     createProductionOrderJobCardData: z.record(z.unknown()).describe("A JSON object to create and post job card for production order. Must include ProdId, JobId, QtyGood, Hours"),
 });
+
+const getProductionOrderCostSheetSchema = z.object({
+    getProductionOrderCostSheetData: z.record(z.unknown()).describe("A JSON object to production order costing sheet. Must include InventCostLevel, CostSheetPanelPer, Qty, Mode, ProdId"),
+});
 /**
  * Creates and configures the MCP server with all the tools for the D365 API.
  * @returns {McpServer} The configured McpServer instance. 
@@ -527,6 +531,20 @@ server.tool(
             });
         }
     );
+
+    server.tool(
+        'getProductionOrderCostSheet',
+        'Get Production order costing sheet based on InventCostLevel, CostSheetPanelPer, Qty, Mode, ProdId',
+        getProductionOrderCostSheetSchema.shape,
+        async ({ getProductionOrderCostSheetData }: z.infer<typeof getProductionOrderCostSheetSchema>, context: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
+            const url = `${process.env.DYNAMICS_RESOURCE_URL}/api/services/IGDProdOrderServiceGroup/IGDProdOrderService/getProductionOrderCostSheet`;
+            return makeApiCall('POST', url, getProductionOrderCostSheetData as Record<string, unknown>, async (notification) => {
+                await safeNotification(context, notification);
+            });
+        }
+    );
+
+    
 /*
     server.tool(
         'getEntityCount',
@@ -603,6 +621,7 @@ server.tool(
 
     return server;
 };
+
 
 
 
